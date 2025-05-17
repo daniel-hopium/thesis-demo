@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+            kubernetes {
+                label 'docker-agent'
+                yamlFile 'jenkins/agent-dind.yaml'
+            }
+        }
     environment {
         // Docker & Helm Registry Credentials
         DOCKER_IMAGE = 'if22b041/thesis-demo'
@@ -8,6 +13,14 @@ pipeline {
         HELM_CHART_NAME = 'my-helm-chart'
     }
     stages {
+    stage('Docker Version') {
+                steps {
+                    container('dind') {
+                        sh 'dockerd-entrypoint.sh & sleep 5'
+                        sh 'docker version'
+                    }
+                }
+                }
         stage('Checkout Code') {
             steps {
                 // Pull source code from GitHub
