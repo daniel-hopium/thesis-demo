@@ -17,6 +17,6 @@ class ThesisDemoApplicationTests {
   @Test
   void helloEndpointReturnsExpectedMessage() {
     ResponseEntity<String> response = restTemplate.getForEntity("/hello", String.class);
-    assertThat(response.getBody()).contains("This is a message from a Spring Application running in a Kubernetes cluster!");
+    assertThat(response.getBody()).contains("This is a message from a Spring Applicationn running in a Kubernetes cluster!");
   }
 }
