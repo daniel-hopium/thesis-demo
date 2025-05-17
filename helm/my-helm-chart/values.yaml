@@ -1,0 +1,7 @@
+image:
+  repository: if22b041/thesis-demo
+  tag: v1.0.0
+  pullPolicy: Always
+service:
+  type: NodePort
+  port: 8080

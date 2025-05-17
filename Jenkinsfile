@@ -1,55 +1,50 @@
 pipeline {
     agent any
-
     environment {
-        IMAGE_NAME = 'if22b041/thesis-demo-app'
-        TAG = 'latest'
-        DOCKERHUB_CREDENTIALS = 'docker-registry-credentials'
+        // Docker & Helm Registry Credentials
+        DOCKER_IMAGE = 'if22b041/thesis-demo'
+        DOCKER_TAG = 'v1.0.0'
+        DOCKER_REGISTRY_CREDENTIALS = 'docker-registry-credentials'
+        HELM_CHART_NAME = 'my-helm-chart'
     }
-
     stages {
-        stage('Checkout App Code') {
+        stage('Checkout Code') {
             steps {
-                git url: 'https://github.com/daniel-hopium/thesis-demo.git'
+                // Pull source code from GitHub
+                git branch: 'master', url: 'https://github.com/daniel-hopium/thesis-demo.git'
             }
         }
-
-        stage('Build and Push Docker Image') {
+        stage('Build Docker Image') {
             steps {
-                sh "docker build -t ${IMAGE_NAME}:${TAG} ."
-
-                withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CREDENTIALS}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh 'echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin'
-                    sh "docker push ${IMAGE_NAME}:${TAG}"
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', DOCKER_REGISTRY_CREDENTIALS) {
+                        // Build and push Docker image
+                        def app = docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
+                        app.push()
+                    }
                 }
             }
         }
-
-        stage('Checkout Helm Chart Repo') {
+        stage('Deploy to Kubernetes using Helm') {
             steps {
-                dir('helm-chart') {
-                    git url: 'https://github.com/daniel-hopium/thesis-demo-helm.git'
-                }
-            }
-        }
-
-        stage('Update Image Tag in Helm Values') {
-            steps {
-                dir('helm-chart') {
+                script {
                     sh """
-                        sed -i 's|repository:.*|repository: ${IMAGE_NAME}|' values.yaml
-                        sed -i 's|tag:.*|tag: ${TAG}|' values.yaml
+                    # Update Helm chart values with new Docker image
+                    helm upgrade --install ${HELM_CHART_NAME} ./helm/${HELM_CHART_NAME} \
+                        --set image.repository=${DOCKER_IMAGE} \
+                        --set image.tag=${DOCKER_TAG} \
+                        --namespace default
                     """
                 }
             }
         }
-
-        stage('Deploy to Kubernetes via Helm') {
-            steps {
-                dir('helm-chart') {
-                    sh "helm upgrade --install ${IMAGE_NAME} . --namespace default"
-                }
-            }
+    }
+    post {
+        success {
+            echo 'Deployment completed successfully!'
+        }
+        failure {
+            echo 'Deployment failed!'
         }
     }
 }

@@ -1,0 +1,4 @@
+apiVersion: v2
+name: my-helm-chart
+description: A Helm chart for my Dockerized application
+version: 1.0.0
