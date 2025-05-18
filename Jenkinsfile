@@ -5,6 +5,10 @@ pipeline {
         jdk 'java-21'
     }
 
+    environment {
+            IMAGE_NAME = 'my-java-app:latest'
+        }
+
     stages {
         stage('Checkout') {
             steps {
@@ -29,5 +33,13 @@ pipeline {
                 }
             }
         }
+
+        stage('Docker Build') {
+                    steps {
+                        script {
+                            sh 'docker build -t $IMAGE_NAME .'
+                        }
+                    }
+                }
     }
 }
