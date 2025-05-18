@@ -3,6 +3,11 @@ pipeline {
 
     tools {
         jdk 'java-21'
+        docker {
+              image 'docker:20.10.24-dind'
+              args '--privileged'  // Needed for DinD to work in container
+            }
+
     }
 
     environment {
@@ -10,6 +15,12 @@ pipeline {
         }
 
     stages {
+        stage('Docker Build') {
+            steps {
+                sh 'docker version'
+            }
+        }
+
         stage('Checkout') {
             steps {
               git url: 'https://github.com/daniel-hopium/thesis-demo.git'            }
