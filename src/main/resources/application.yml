@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: thesis-demo
+
+app:
+  message: This is a message from a Spring Application running in a Kubernetes cluster!
+server:
+  port: 8080

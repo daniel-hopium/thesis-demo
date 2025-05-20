@@ -72,20 +72,12 @@ pipeline {
             }
         }
 
-        stage('Checkout Helm Chart Repo') {
-            steps {
-                dir('thesis-demo-helm') {
-                    git url: 'https://github.com/daniel-hopium/thesis-demo-helm.git'
-                }
-            }
-        }
-
         stage('Deploy to Kubernetes via Helm') {
             steps {
                 script {
                     withEnv(["KUBECONFIG="]) {
                         sh '''
-                        helm upgrade --install my-thesis-app ./thesis-demo-helm \
+                        helm upgrade --install my-thesis-app ./helm \
                             --kube-apiserver http://host.docker.internal:8001
                         '''
                     }

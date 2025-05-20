@@ -1,0 +1,5 @@
+replicaCount: 3
+
+configmap:
+  data:
+    message: This is a message from a Spring App deployed in PROD!
