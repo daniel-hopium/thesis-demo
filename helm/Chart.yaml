@@ -1,5 +1,0 @@
-apiVersion: v2
-name: my-thesis-app
-description: Spring Boot app with Helm, Jenkins & ArgoCD
-version: 0.1.0
-appVersion: "0.0.1-SNAPSHOT"

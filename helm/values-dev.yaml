@@ -1,6 +1,0 @@
-replicaCount: 7
-
-configmap:
-  name: myhelmapp-configmap-v2
-  data:
-    message: This is a message from a Spring App deployed in DEV!
